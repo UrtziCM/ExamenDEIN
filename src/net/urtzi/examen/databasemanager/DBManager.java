@@ -83,6 +83,27 @@ public class DBManager {
 		}
 		return true;
 	}
+	public Comida getProductoByID(String codigo) throws SQLException {
+		conexion = new ConnectionDB();
+		Comida equ = null;
+		String sql = String.format("SELECT * FROM productos WHERE codigo = ?");
+		PreparedStatement pstmt = conexion.getConexion().prepareStatement(sql);
+		pstmt.setString(1, codigo);
+		pstmt.executeQuery();
+		ResultSet rs = pstmt.getResultSet();
+		if (rs.next()) {
+			if (rs.getBlob("imagen") != null) {				
+				SerializableImage img = new SerializableImage(rs.getBlob("imagen").getBinaryStream());
+				equ = new Comida(rs.getString("codigo"), rs.getString("nombre"), rs.getDouble("precio"), rs.getBoolean("disponible"),img);
+			}
+			else
+				equ = new Comida(rs.getString("codigo"), rs.getString("nombre"), rs.getDouble("precio"), rs.getBoolean("disponible"));
+		}
+		conexion.closeConexion();
+		return equ;
+	}
+	
+	
 
 	
 	

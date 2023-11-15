@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import javafx.collections.ObservableList;
@@ -20,6 +21,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import net.urtzi.examen.databasemanager.DBManager;
@@ -97,7 +99,7 @@ public class ProductoController implements javafx.fxml.Initializable {
 
     @FXML
     void limpiarTextfields(ActionEvent event) {
-
+    	
     }
 
     @FXML
@@ -106,8 +108,17 @@ public class ProductoController implements javafx.fxml.Initializable {
     }
 
     @FXML
-    void onTableClicked(MouseEvent event) {
-
+    void onTableClicked(MouseEvent event) throws SQLException {
+    	if (event.getButton() == MouseButton.PRIMARY && tablaComida.getSelectionModel().getSelectedItem() != null) {
+    		Comida c = tablaComida.getSelectionModel().getSelectedItem();
+    		c = gestor.getProductoByID(c.getCodigo());
+    		textfCodigo.setText(c.getCodigo());
+    		textfCodigo.setDisable(true);
+    		txtfNombre.setText(c.getNombre());
+    		txtfPrecio.setText(c.getPrecio()+"");
+    		imagenSeleccionada.setImage(c.getImg());
+    		
+    	}
     }
 
     @FXML
