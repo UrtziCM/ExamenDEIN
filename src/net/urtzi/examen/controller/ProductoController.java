@@ -99,7 +99,12 @@ public class ProductoController implements javafx.fxml.Initializable {
 
     @FXML
     void limpiarTextfields(ActionEvent event) {
-    	
+    	textfCodigo.setDisable(false);
+    	textfCodigo.setText("");
+    	txtfNombre.setText("");
+    	txtfPrecio.setText("");
+    	checkboxDispo.setSelected(false);
+    	imagenSeleccionada.setImage(null);
     }
 
     @FXML
@@ -116,8 +121,8 @@ public class ProductoController implements javafx.fxml.Initializable {
     		textfCodigo.setDisable(true);
     		txtfNombre.setText(c.getNombre());
     		txtfPrecio.setText(c.getPrecio()+"");
+    		checkboxDispo.setSelected(c.isDisponible());
     		imagenSeleccionada.setImage(c.getImg());
-    		
     	}
     }
 
