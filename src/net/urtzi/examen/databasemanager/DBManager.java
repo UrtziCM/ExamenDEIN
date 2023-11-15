@@ -1,10 +1,14 @@
 package net.urtzi.examen.databasemanager;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,6 +63,31 @@ public class DBManager {
 		}
 		return comidas;
 	}
+	
+	public boolean addProducto(Comida comida) throws IOException {
+		try {
+			conexion = new ConnectionDB();
+			String sqlAddEquipo;
+			sqlAddEquipo = "INSERT INTO productos VALUES(?,?,?,?,?)";
+			PreparedStatement pstm = conexion.getConexion().prepareStatement(sqlAddEquipo);
+			pstm.setString(1, comida.getCodigo());
+			pstm.setString(2, comida.getNombre());
+			pstm.setDouble(3, comida.getPrecio());
+			int disponible=(comida.isDisponible())?1:0;
+			pstm.setInt(4, disponible);
+			if (comida.getImg() != null)
+				pstm.setObject(5, comida.getImg());
+			else
+				pstm.setNull(5, Types.BLOB);
+			pstm.executeUpdate();
+			conexion.closeConexion();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
+	
 
 
 }

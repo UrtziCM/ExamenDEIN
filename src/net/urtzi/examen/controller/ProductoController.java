@@ -1,5 +1,8 @@
 package net.urtzi.examen.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -13,8 +16,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 import net.urtzi.examen.databasemanager.DBManager;
 import net.urtzi.examen.models.Comida;
+import net.urtzi.examen.models.SerializableImage;
 
 /**
  * Controlador principal de la aplicacion principal.
@@ -50,6 +55,7 @@ public class ProductoController implements javafx.fxml.Initializable {
     private TextField txtfPrecio;
     private DBManager gestor;
     private ObservableList<Comida> data;
+    private static File imagenArchivo;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -57,7 +63,6 @@ public class ProductoController implements javafx.fxml.Initializable {
 		prepareTableForDBItems();
 		data = gestor.cargarComida();
 		tablaComida.setItems(data);
-		
 	}
 	
 
@@ -67,8 +72,20 @@ public class ProductoController implements javafx.fxml.Initializable {
     }
 
     @FXML
-    void crearComida(ActionEvent event) {
-
+    void crearComida(ActionEvent event) throws IOException {
+    	System.out.println("Creando comida");
+    	String codigo = textfCodigo.getText();
+    	String nombre = txtfNombre.getText();
+    	double precio = Double.parseDouble(txtfPrecio.getText());
+    	boolean disponible = checkboxDispo.isSelected();
+    	SerializableImage img;
+    	if (imagenArchivo!=null)
+    		img = new SerializableImage(new FileInputStream(imagenArchivo));
+    	else 
+    		img = null;
+    	
+    	gestor.addProducto(new Comida(codigo,nombre,precio,disponible,img));
+    	tablaComida.setItems(data=gestor.cargarComida());
     }
 
     @FXML
@@ -88,7 +105,7 @@ public class ProductoController implements javafx.fxml.Initializable {
 
     @FXML
     void seleccionarImagen(ActionEvent event) {
-
+    	imagenArchivo = new FileChooser().showOpenDialog(null);
     }
     
     private void prepareTableForDBItems() {
