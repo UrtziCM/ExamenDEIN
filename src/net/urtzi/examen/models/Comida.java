@@ -5,6 +5,7 @@ public class Comida {
 	private String nombre;
 	private double precio;
 	private boolean disponible;
+	private SerializableImage img;
 	
 	public String getCodigo() {
 		return codigo;
@@ -24,5 +25,11 @@ public class Comida {
 		this.precio = precio;
 		this.disponible = disponible;
 	}
-	
+	public Comida(String codigo, String nombre, double precio, boolean disponible, SerializableImage img) {
+		this.codigo = codigo;
+		this.nombre = nombre;
+		this.precio = precio;
+		this.disponible = disponible;
+		this.img = img;
+	}
 }
