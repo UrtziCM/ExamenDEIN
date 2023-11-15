@@ -11,9 +11,13 @@ import java.util.ResourceBundle;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -23,10 +27,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import javafx.stage.PopupWindow.AnchorLocation;
+import javafx.stage.Stage;
 import net.urtzi.examen.databasemanager.DBManager;
-import net.urtzi.examen.models.Comida;
-import net.urtzi.examen.models.SerializableImage;
+import net.urtzi.examen.models.*;
 
 /**
  * Controlador principal de la aplicacion principal.
@@ -76,23 +82,31 @@ public class ProductoController implements javafx.fxml.Initializable {
 	
 
     @FXML
-    void actualizarComida(ActionEvent event) {
-
-    }
-
-    @FXML
-    void crearComida(ActionEvent event) throws IOException {
-    	System.out.println("Creando comida");
+    void actualizarComida(ActionEvent event) throws IOException {
     	String codigo = textfCodigo.getText();
     	String nombre = txtfNombre.getText();
     	double precio = Double.parseDouble(txtfPrecio.getText());
     	boolean disponible = checkboxDispo.isSelected();
-    	SerializableImage img;
+    	LocatedImage img;
     	if (imagenArchivo!=null)
-    		img = new SerializableImage(new FileInputStream(imagenArchivo));
+    		img = new LocatedImage(imagenArchivo.getAbsolutePath());
     	else 
     		img = null;
-    	
+    	gestor.actualizarProducto(new Comida(codigo,nombre,precio,disponible,img));
+    	tablaComida.setItems(data=gestor.cargarComida());
+    }
+
+    @FXML
+    void crearComida(ActionEvent event) throws IOException {
+    	String codigo = textfCodigo.getText();
+    	String nombre = txtfNombre.getText();
+    	double precio = Double.parseDouble(txtfPrecio.getText());
+    	boolean disponible = checkboxDispo.isSelected();
+    	LocatedImage img;
+    	if (imagenArchivo!=null)
+    		img = new LocatedImage(imagenArchivo.getPath().toString());
+    	else 
+    		img = null;
     	gestor.addProducto(new Comida(codigo,nombre,precio,disponible,img));
     	tablaComida.setItems(data=gestor.cargarComida());
     }
@@ -104,6 +118,8 @@ public class ProductoController implements javafx.fxml.Initializable {
     	txtfNombre.setText("");
     	txtfPrecio.setText("");
     	checkboxDispo.setSelected(false);
+    	btnActualizar.setDisable(true);
+    	btnCrear.setDisable(false);
     	imagenSeleccionada.setImage(null);
     }
 
@@ -119,11 +135,45 @@ public class ProductoController implements javafx.fxml.Initializable {
     		c = gestor.getProductoByID(c.getCodigo());
     		textfCodigo.setText(c.getCodigo());
     		textfCodigo.setDisable(true);
+    		btnCrear.setDisable(true);
+    		btnActualizar.setDisable(false);
     		txtfNombre.setText(c.getNombre());
     		txtfPrecio.setText(c.getPrecio()+"");
     		checkboxDispo.setSelected(c.isDisponible());
     		imagenSeleccionada.setImage(c.getImg());
+    	} else if (event.getButton() == MouseButton.SECONDARY && tablaComida.getSelectionModel().getSelectedItem() != null) {
+    		ContextMenu menu = new ContextMenu();
+    		MenuItem borrar = new MenuItem("Borrar");
+    		MenuItem imagen = new MenuItem("Imagen");
+    		imagen.setOnAction(e -> {
+				try {
+					verImagen();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			});
+    		borrar.setOnAction(e -> {
+				try {
+					gestor.borrarProducto(tablaComida.getSelectionModel().getSelectedItem());
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
+    		menu.getItems().add(borrar);
+    		menu.getItems().add(imagen);
+    		menu.setX(event.getScreenX());
+    		menu.setY(event.getScreenY());
+    		menu.show(tablaComida.getScene().getWindow());
+    		
     	}
+    	
+    }
+    
+    private void verImagen() throws SQLException {
+    	Comida c = tablaComida.getSelectionModel().getSelectedItem();
+		c = gestor.getProductoByID(c.getCodigo());
+		mostrarVentanaImagen(c.getImg());
     }
 
     @FXML
@@ -155,6 +205,15 @@ public class ProductoController implements javafx.fxml.Initializable {
 		anadidoAnimal.setHeaderText(null);
 		anadidoAnimal.setContentText(content);
 		anadidoAnimal.showAndWait();
+	}
+	private static void mostrarVentanaImagen(Image img) {
+		if (img == null) return;
+		BorderPane bpImagen = new BorderPane();
+		bpImagen.getChildren().add(new ImageView(img));
+		Scene scn = new Scene(bpImagen);
+		Stage stg = new Stage();
+		stg.setScene(scn);
+		stg.showAndWait();
 	}
 
 

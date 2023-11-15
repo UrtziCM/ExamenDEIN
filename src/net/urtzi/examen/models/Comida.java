@@ -1,11 +1,13 @@
 package net.urtzi.examen.models;
 
+import javafx.scene.image.Image;
+
 public class Comida {
 	private String codigo;
 	private String nombre;
 	private double precio;
 	private boolean disponible;
-	private SerializableImage img;
+	private Image img;
 	
 	public String getCodigo() {
 		return codigo;
@@ -19,7 +21,7 @@ public class Comida {
 	public boolean isDisponible() {
 		return disponible;
 	}
-	public SerializableImage getImg() {
+	public Image getImg() {
 		return img;
 	}
 	public Comida(String codigo, String nombre, double precio, boolean disponible) {
@@ -28,7 +30,7 @@ public class Comida {
 		this.precio = precio;
 		this.disponible = disponible;
 	}
-	public Comida(String codigo, String nombre, double precio, boolean disponible, SerializableImage img) {
+	public Comida(String codigo, String nombre, double precio, boolean disponible, Image img) {
 		this.codigo = codigo;
 		this.nombre = nombre;
 		this.precio = precio;

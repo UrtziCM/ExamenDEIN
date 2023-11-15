@@ -1,5 +1,7 @@
 package net.urtzi.examen.databasemanager;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.PreparedStatement;
@@ -9,6 +11,7 @@ import java.sql.Types;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.image.Image;
 import net.urtzi.examen.models.*;
 
 /**
@@ -41,9 +44,9 @@ public class DBManager {
 				double precio= rs.getDouble("precio");
 				boolean disponible =(rs.getInt("disponible")==1)?true:false;
 				InputStream imagenStream = rs.getBinaryStream("imagen");
-				SerializableImage imagen;
+				Image imagen;
 				if (imagenStream != null) {					
-					imagen = new SerializableImage(imagenStream);
+					imagen = new Image(imagenStream);
 				}else {					
 					imagen = null;
 				}
@@ -72,8 +75,9 @@ public class DBManager {
 			pstm.setDouble(3, comida.getPrecio());
 			int disponible=(comida.isDisponible())?1:0;
 			pstm.setInt(4, disponible);
-			if (comida.getImg() != null)
-				pstm.setObject(5, comida.getImg());
+			if (comida.getImg() != null) {
+				pstm.setBinaryStream(5, new FileInputStream(comida.getImg().getUrl()));
+			}
 			else
 				pstm.setNull(5, Types.BLOB);
 			pstm.executeUpdate();
@@ -93,7 +97,7 @@ public class DBManager {
 		ResultSet rs = pstmt.getResultSet();
 		if (rs.next()) {
 			if (rs.getBlob("imagen") != null) {				
-				SerializableImage img = new SerializableImage(rs.getBlob("imagen").getBinaryStream());
+				Image img = new Image(rs.getBlob("imagen").getBinaryStream());
 				equ = new Comida(rs.getString("codigo"), rs.getString("nombre"), rs.getDouble("precio"), rs.getBoolean("disponible"),img);
 			}
 			else
@@ -102,7 +106,37 @@ public class DBManager {
 		conexion.closeConexion();
 		return equ;
 	}
-	
+	public boolean actualizarProducto(Comida comida) throws IOException {
+		try {
+			conexion = new ConnectionDB();
+			String sqlAddEquipo;
+			sqlAddEquipo = "REPLACE INTO productos VALUES(?,?,?,?,?)";
+			PreparedStatement pstm = conexion.getConexion().prepareStatement(sqlAddEquipo);
+			pstm.setString(1, comida.getCodigo());
+			pstm.setString(2, comida.getNombre());
+			pstm.setDouble(3, comida.getPrecio());
+			int disponible=(comida.isDisponible())?1:0;
+			pstm.setInt(4, disponible);
+			if (comida.getImg() != null) {
+				pstm.setBinaryStream(5, new FileInputStream(new File(comida.getImg().getUrl())));
+			}
+			else
+				pstm.setNull(5, Types.BLOB);
+			pstm.executeUpdate();
+			conexion.closeConexion();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+	public void borrarProducto(Comida comida) throws SQLException {
+		conexion = new ConnectionDB();
+		String sql = "DELETE FROM productos WHERE codigo=?";
+		PreparedStatement stmt = conexion.getConexion().prepareStatement(sql);
+		stmt.setString(1, comida.getCodigo());
+		stmt.executeUpdate(sql);
+		conexion.closeConexion();
+	}
 	
 
 	
