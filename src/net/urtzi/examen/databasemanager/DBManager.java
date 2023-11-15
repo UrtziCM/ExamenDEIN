@@ -1,13 +1,10 @@
 package net.urtzi.examen.databasemanager;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 
 import javafx.collections.FXCollections;
@@ -86,6 +83,7 @@ public class DBManager {
 		}
 		return true;
 	}
+
 	
 	
 
