@@ -2,6 +2,7 @@ package net.urtzi.examen.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -15,6 +16,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import net.urtzi.examen.databasemanager.DBManager;
@@ -27,6 +30,8 @@ import net.urtzi.examen.models.SerializableImage;
 
 public class ProductoController implements javafx.fxml.Initializable {
 
+	@FXML
+    private ImageView imagenSeleccionada;
 	@FXML
     private Button btnActualizar;
 
@@ -95,7 +100,7 @@ public class ProductoController implements javafx.fxml.Initializable {
 
     @FXML
     void onAboutClicked(ActionEvent event) {
-
+    	
     }
 
     @FXML
@@ -106,6 +111,14 @@ public class ProductoController implements javafx.fxml.Initializable {
     @FXML
     void seleccionarImagen(ActionEvent event) {
     	imagenArchivo = new FileChooser().showOpenDialog(null);
+    	try (FileInputStream img =new FileInputStream(imagenArchivo)) {    		
+    		imagenSeleccionada.setImage(new Image(img));
+    	} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
     }
     
     private void prepareTableForDBItems() {
