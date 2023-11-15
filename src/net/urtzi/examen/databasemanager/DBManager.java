@@ -1,5 +1,6 @@
 package net.urtzi.examen.databasemanager;
 
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,30 +27,37 @@ public class DBManager {
 	 * @see net.urtzi.examen.models.Deporte
 	 */
 	public ObservableList<Comida> cargarComida() {
-		ObservableList<Comida> deportes = FXCollections.observableArrayList();
+		ObservableList<Comida> comidas = FXCollections.observableArrayList();
 		try {
 			conexion = new ConnectionDB();
-			String consulta = "SELECT * FROM Receta";
+			String consulta = "SELECT * FROM productos";
 			PreparedStatement pstmt = conexion.getConexion().prepareStatement(consulta);
 			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-				String codigo = rs.getString("id_deporte");
+				String codigo = rs.getString("codigo");
 				String nombre = rs.getString("nombre");
 				double precio= rs.getDouble("precio");
 				boolean disponible =(rs.getInt("disponible")==1)?true:false;
-				SerializableImage imagen = new SerializableImage(rs.getBinaryStream("imagen"));
-				Comida d = new Comida(codigo,nombre,precio,disponible,imagen);
-				deportes.add(d);
+				InputStream imagenStream = rs.getBinaryStream("imagen");
+				SerializableImage imagen;
+				if (imagenStream != null) {					
+					imagen = new SerializableImage(imagenStream);
+				}else {					
+					imagen = null;
+				}
+				Comida c = new Comida(codigo,nombre,precio,disponible,imagen);
+				comidas.add(c);
 			}
 
 			rs.close();
 			conexion.closeConexion();
 
 		} catch (SQLException e) {
-			System.out.println("Error en la carga de deportes desde la base de datos");
+			System.out.println("Error en la carga de productos desde la base de datos");
+			e.printStackTrace();
 		}
-		return deportes;
+		return comidas;
 	}
 
 
