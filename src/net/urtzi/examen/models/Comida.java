@@ -18,4 +18,11 @@ public class Comida {
 	public boolean isDisponible() {
 		return disponible;
 	}
+	public Comida(String codigo, String nombre, double precio, boolean disponible) {
+		this.codigo = codigo;
+		this.nombre = nombre;
+		this.precio = precio;
+		this.disponible = disponible;
+	}
+	
 }
