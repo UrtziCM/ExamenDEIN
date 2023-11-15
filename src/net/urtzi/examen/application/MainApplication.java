@@ -14,7 +14,7 @@ public class MainApplication extends Application {
 		try {
 			Parent root = FXMLLoader.load(this.getClass().getResource("/fxml/comida.fxml"));
 	    	Scene scene = new Scene( root );
-	    	
+	    	scene.getStylesheets().add(this.getClass().getResource("/css/main.css").toExternalForm());
 	        stage.setTitle("Productos - Gestion");
 	        stage.setScene(scene);
 	        stage.setResizable(false);
